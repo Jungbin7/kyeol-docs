@@ -57,14 +57,14 @@
 ## 3) 리전/프로바이더/인증서(고정)
 
 ### 3.1 리전
-- 기본 리전: **ap-southeast-2 (Sydney)**
+- 기본 리전: **ap-northeast-1 (Tokyo)**
 - AZ 표기는 `a`, `c` 사용:
-  - `ap-southeast-2a`
-  - `ap-southeast-2c`
+  - `ap-northeast-1a`
+  - `ap-northeast-1c`
 
 ### 3.2 ACM 인증서
 - CloudFront 인증서: **us-east-1** (필수)
-- ALB(Ingress) 인증서: **ap-southeast-2**
+- ALB(Ingress) 인증서: **ap-northeast-1**
 - 권장: `*.msp-g1.click` 와일드카드 + 필요한 SAN 관리
 
 ---
@@ -124,19 +124,19 @@
 - 소문자 + 하이픈(-)
 
 ### 5.2 추가 프리픽스(필수)
-- 모든 AWS 리소스(Name tag, 식별자, 물리 이름)에 **`min-`** 프리픽스를 반드시 붙인다.
-- 최종 네이밍: `min-kyeol-[env]-...`
+- 모든 AWS 리소스(Name tag, 식별자, 물리 이름)에 **`jung-`** 프리픽스를 반드시 붙인다.
+- 최종 네이밍: `jung-kyeol-[env]-...`
 
 ### 5.3 예시
-- VPC: `min-kyeol-dev-vpc`
-- Subnet: `min-kyeol-dev-sub-pub-a`
-- NAT GW: `min-kyeol-dev-nat-a`
-- EKS: `min-kyeol-dev-eks`
-- SG: `min-kyeol-dev-sg-alb`
+- VPC: `jung-kyeol-dev-vpc`
+- Subnet: `jung-kyeol-dev-sub-pub-a`
+- NAT GW: `jung-kyeol-dev-nat-a`
+- EKS: `jung-kyeol-dev-eks`
+- SG: `jung-kyeol-dev-sg-alb`
 
 ### 5.4 S3(글로벌 유니크 필수)
-- `min-kyeol-[env]-s3-[usage]-<account>-ap-southeast-2`
-  - 예: `min-kyeol-dev-s3-tfstate-123456789012-ap-southeast-2`
+- `jung-kyeol-[env]-s3-[usage]-<account>-ap-northeast-1`
+  - 예: `jung-kyeol-dev-s3-tfstate-123456789012-ap-northeast-1`
 
 ---
 

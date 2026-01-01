@@ -9,7 +9,7 @@
 | 변수 | 설명 | 위치 | 예시 |
 |------|------|------|------|
 | `aws_account_id` | AWS 계정 ID | terraform.tfvars | `123456789012` |
-| `aws_region` | AWS 리전 | terraform.tfvars | `ap-southeast-2` |
+| `aws_region` | AWS 리전 | terraform.tfvars | `ap-northeast-1` |
 | `hosted_zone_id` | Route53 Hosted Zone ID (msp-g1.click) | terraform.tfvars | `Z0XXXXXXXXXXXX` |
 
 ---
@@ -18,7 +18,7 @@
 
 | 인증서 | 리전 | 용도 | 도메인 |
 |--------|------|------|--------|
-| ALB용 | ap-southeast-2 | Ingress HTTPS | `*.msp-g1.click` 또는 `origin-*.msp-g1.click` |
+| ALB용 | ap-northeast-1 | Ingress HTTPS | `*.msp-g1.click` 또는 `origin-*.msp-g1.click` |
 | CloudFront용 | us-east-1 | CloudFront HTTPS | `*.msp-g1.click` 또는 `dev-kyeol.msp-g1.click` 등 |
 
 ### ACM ARN 확인 방법
