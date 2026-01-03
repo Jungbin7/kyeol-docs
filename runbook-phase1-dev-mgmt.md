@@ -24,7 +24,7 @@
 |-------------|------|------|
 | `ACCOUNT_ID` | AWS 계정 ID | `827913617839` |
 | `HOSTED_ZONE_ID` | Route53 Hosted Zone ID | `Z01193062JD31QR7P4APO` |
-| `ACM_ARN` | ALB용 ACM 인증서 ARN (Tokyo) | `arn:aws:acm:ap-northeast-1:827913617839:certificate/87f8976b-3121-4f1b-a337-b9560a876a44` |
+| `ACM_ARN` | ALB용 ACM 인증서 ARN (Tokyo) | `arn:aws:acm:ap-northeast-1:827913617839:certificate/f7d794c7-e3c3-4cd2-9ef1-bd4aa7d34834` |
 | `REPO_OWNER` | GitHub 사용자/조직 | `Jungbin7` |
 | `AWS_REGION` | AWS 리전 | `ap-northeast-1` |
 
