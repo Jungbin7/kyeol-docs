@@ -4,13 +4,13 @@
 
 ---
 
-## 1. 리전: ap-southeast-2 (Sydney)
+## 1. 리전: ap-northeast-1 (Tokyo)
 
-**결정**: 기본 리전을 `ap-southeast-2`로 설정
+**결정**: 기본 리전을 `ap-northeast-1`로 설정
 
 **이유**:
-- 한국(ap-northeast-2)이 아닌 이유: 글로벌 서비스 시나리오, 비용 다양성
-- Sydney는 호주/오세아니아 서비스에 적합
+- Tokyo는 한국 서비스에 적합한 낮은 지연시간 제공
+- 글로벌 서비스 시나리오 및 비용 효율성 고려
 - spec.md에 명시된 요구사항
 
 ---
@@ -89,15 +89,15 @@
 
 ---
 
-## 8. 네이밍: min-kyeol-[env]-...
+## 8. 네이밍: jung-kyeol-[env]-...
 
-**결정**: 모든 리소스에 `min-` 프리픽스 강제
+**결정**: 모든 리소스에 `jung-` 프리픽스 강제
 
 **이유**:
 - 팀원/프로젝트 식별 용이
 - 멀티 환경 리소스 구분
 - spec.md 명시 사항
-- S3는 글로벌 유니크: `min-kyeol-[env]-s3-[usage]-<account>-<region>`
+- S3는 글로벌 유니크: `jung-kyeol-[env]-s3-[usage]-<account>-<region>`
 
 ---
 

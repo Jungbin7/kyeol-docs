@@ -23,9 +23,9 @@
 | Placeholder | 설명 | 예시 |
 |-------------|------|------|
 | `ACCOUNT_ID` | AWS 계정 ID | `827913617839` |
-| `HOSTED_ZONE_ID` | Route53 Hosted Zone ID | `Z0XXXXXXXXXXXX` |
-| `ACM_ARN` | ALB용 ACM 인증서 ARN (Tokyo) | `arn:aws:acm:ap-northeast-1:...` |
-| `REPO_OWNER` | GitHub 사용자/조직 | `jungbin7` |
+| `HOSTED_ZONE_ID` | Route53 Hosted Zone ID | `Z01193062JD31QR7P4APO` |
+| `ACM_ARN` | ALB용 ACM 인증서 ARN (Tokyo) | `arn:aws:acm:ap-northeast-1:827913617839:certificate/87f8976b-3121-4f1b-a337-b9560a876a44` |
+| `REPO_OWNER` | GitHub 사용자/조직 | `Jungbin7` |
 | `AWS_REGION` | AWS 리전 | `ap-northeast-1` |
 
 ---
@@ -38,19 +38,19 @@
 # 1. kyeol-infra-terraform
 cd kyeol-infra-terraform
 git init
-git remote add origin https://github.com/jungbin7/kyeol-infra-terraform.git
+git remote add origin https://github.com/Jungbin7/kyeol-infra-terraform.git
 git add . && git commit -m "Initial commit: jung-kyeol V2" && git branch -M main && git push -u origin main
 
 # 2. kyeol-platform-gitops
 cd kyeol-platform-gitops
 git init
-git remote add origin https://github.com/jungbin7/kyeol-platform-gitops.git
+git remote add origin https://github.com/Jungbin7/kyeol-platform-gitops.git
 git add . && git commit -m "Initial commit: Platform Addons" && git branch -M main && git push -u origin main
 
 # 3. kyeol-app-gitops
 cd kyeol-app-gitops
 git init
-git remote add origin https://github.com/jungbin7/kyeol-app-gitops.git
+git remote add origin https://github.com/Jungbin7/kyeol-app-gitops.git
 git add . && git commit -m "Initial commit: Saleor Apps" && git branch -M main && git push -u origin main
 ```
 
@@ -65,7 +65,7 @@ terraform apply -auto-approve
 ```
 
 ### 검증
-- S3 버킷 확인: `jung-kyeol-tfstate`
+- S3 버킷 확인: `jung-kyeol-tfstate-827913617839-ap-northeast-1`
 - DynamoDB 확인: `jung-kyeol-tfstate-lock`
 
 ---
@@ -89,9 +89,9 @@ terraform apply -auto-approve
 ```
 
 ### ✅ 핵심 리소스 검증
-1. **PG 전용 NAT**: `jung-kyeol-dev-pg-nat-eip` 확인 (이 IP를 PG사에 전달)
-2. **Valkey**: `jung-kyeol-dev-valkey` 클러스터 상태 확인
-3. **RDS**: `jung-kyeol-dev-rds` 암호화(KMS) 적용 여부 확인
+1. **ALB LBC**: `jung-kyeol-dev-alb-controller-role` 확인
+2. **Valkey**: `jung-kyeol-dev-cache` 복제 그룹 상태 확인
+3. **RDS**: `jung-kyeol-dev-rds` 인스턴스 확인
 
 ---
 
@@ -99,11 +99,11 @@ terraform apply -auto-approve
 
 ```bash
 # 컨텍스트 업데이트
-aws eks update-kubeconfig --region ap-northeast-1 --name jung-kyeol-mgmt-eks --alias mgmt
-aws eks update-kubeconfig --region ap-northeast-1 --name jung-kyeol-dev-eks --alias dev
+aws eks update-kubeconfig --region ap-northeast-1 --name jung-kyeol-mgmt-eks
+aws eks update-kubeconfig --region ap-northeast-1 --name jung-kyeol-dev-eks
 
 # MGMT에 ArgoCD 설치
-kubectl config use-context mgmt
+kubectl config use-context arn:aws:eks:ap-northeast-1:827913617839:cluster/jung-kyeol-mgmt-eks
 cd kyeol-platform-gitops
 kubectl apply -k argocd/bootstrap/
 ```
@@ -112,14 +112,13 @@ kubectl apply -k argocd/bootstrap/
 
 ## 6. DEV 클러스터 Addons 설치 (ArgoCD 연동)
 
-> ⚠️ 수동 헬름 설치 대신 ArgoCD를 통해 관리합니다.
-
 ```bash
 # DEV 클러스터를 MGMT ArgoCD에 등록
-argocd cluster add dev --name jung-kyeol-dev
+# (MGMT 컨텍스트에서 실행)
+argocd cluster add arn:aws:eks:ap-northeast-1:827913617839:cluster/jung-kyeol-dev-eks --name dev-cluster
 
-# Addons 배포 (ALB Controller, ExternalDNS)
-# kyeol-platform-gitops/clusters/dev/root-app.yaml 배포 (가정)
+# Root App 배포
+kubectl apply -f argocd/app-of-apps/root-app.yaml
 ```
 
 ---
@@ -131,18 +130,11 @@ argocd cluster add dev --name jung-kyeol-dev
 
 ### 7.2. Saleor 앱 배포
 ```bash
-kubectl config use-context dev
-kubectl apply -k kyeol-app-gitops/apps/saleor/overlays/dev/
+# MGMT 컨텍스트에서 실행 (ArgoCD Application 등록)
+kubectl apply -f kyeol-app-gitops/argocd/applications/saleor-dev.yaml
 ```
 
 ### 7.3. 최종 확인
-- **Ingress**: `kubectl get ingress -n kyeol`
-- **DNS**: `origin-dev-kyeol.msp-g1.click` 접속 확인
-- **CloudFront**: 생성된 CF 도메인으로 접속 및 WAF 작동 확인
-
----
-
-## 11. 트러블슈팅
-
-### PG NAT 고정 IP 확인
-결제 Pod 내에서 `curl ifconfig.me` 실행 시, AWS 콘솔의 `pg-nat-eip` 주소와 일치해야 합니다. 일치하지 않으면 라우팅 테이블 및 Subnet 배치를 확인하십시오.
+- **Ingress**: `kubectl get ingress -n kyeol` (dev 컨텍스트)
+- **DNS**: `https://dev.mgz-g2-u3.shop` 접속 확인
+- **CloudFront**: `https://kyeol.mgz-g2-u3.shop` (Phase-2)

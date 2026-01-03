@@ -8,24 +8,24 @@
 
 | 변수 | 설명 | 위치 | 예시 |
 |------|------|------|------|
-| `aws_account_id` | AWS 계정 ID | terraform.tfvars | `123456789012` |
+| `aws_account_id` | AWS 계정 ID | terraform.tfvars | `827913617839` |
 | `aws_region` | AWS 리전 | terraform.tfvars | `ap-northeast-1` |
-| `hosted_zone_id` | Route53 Hosted Zone ID (msp-g1.click) | terraform.tfvars | `Z0XXXXXXXXXXXX` |
+| `hosted_zone_id` | Route53 Hosted Zone ID (mgz-g2-u3.shop) | terraform.tfvars | `Z01193062JD31QR7P4APO` |
 
 ---
 
-## ACM 인증서 (수동 발급 권장)
+## ACM 인증서 (수동 발급 완료)
 
 | 인증서 | 리전 | 용도 | 도메인 |
 |--------|------|------|--------|
-| ALB용 | ap-northeast-1 | Ingress HTTPS | `*.msp-g1.click` 또는 `origin-*.msp-g1.click` |
-| CloudFront용 | us-east-1 | CloudFront HTTPS | `*.msp-g1.click` 또는 `dev-kyeol.msp-g1.click` 등 |
+| ALB용 | ap-northeast-1 | Ingress HTTPS | `*.mgz-g2-u3.shop` |
+| CloudFront용 | us-east-1 | CloudFront HTTPS | `*.mgz-g2-u3.shop` |
 
 ### ACM ARN 확인 방법
 
 ```powershell
-# ap-southeast-2 (ALB용)
-aws acm list-certificates --region ap-southeast-2
+# ap-northeast-1 (ALB용)
+aws acm list-certificates --region ap-northeast-1
 
 # us-east-1 (CloudFront용)
 aws acm list-certificates --region us-east-1
@@ -40,7 +40,7 @@ aws acm list-certificates --region us-east-1
 | 변수 | 필수 | 설명 |
 |------|:----:|------|
 | `aws_account_id` | ✅ | S3 버킷 네이밍에 사용 |
-| `aws_region` | ❌ | 기본값: ap-southeast-2 |
+| `aws_region` | ❌ | 기본값: ap-northeast-1 |
 
 ### DEV / MGMT
 
@@ -58,8 +58,8 @@ aws acm list-certificates --region us-east-1
 
 | 파일 | 교체 대상 | 값 출처 |
 |------|-----------|---------|
-| `clusters/dev/values/aws-load-balancer-controller.values.yaml` | `serviceAccount.annotations.eks.amazonaws.com/role-arn` | Terraform output: `alb_controller_role_arn` |
-| `clusters/dev/values/external-dns.values.yaml` | `serviceAccount.annotations.eks.amazonaws.com/role-arn` | Terraform output: `external_dns_role_arn` |
+| `clusters/dev/addons/aws-load-balancer-controller/values.yaml` | `role-arn` | Terraform output: `alb_controller_role_arn` |
+| `clusters/dev/addons/external-dns/values.yaml` | `role-arn` | Terraform output: `external_dns_role_arn` |
 
 ### App GitOps
 
@@ -70,12 +70,12 @@ aws acm list-certificates --region us-east-1
 
 ---
 
-## GitHub OIDC (선택, CI/CD용)
+## GitHub OIDC (CI/CD용)
 
 | 항목 | 설명 |
 |------|------|
-| GitHub OIDC Role ARN | GitHub Actions → ECR 푸시용 IAM 역할 |
-| GitHub Repo URL | ArgoCD 소스 레포지토리 |
+| GitHub Actions Role ARN | `arn:aws:iam::827913617839:role/jung-kyeol-mgmt-github-actions-role` |
+| GitHub Repo URL | `https://github.com/Jungbin7/...` |
 
 ---
 
@@ -86,11 +86,5 @@ aws acm list-certificates --region us-east-1
 aws sts get-caller-identity --query Account --output text
 
 # Hosted Zone ID
-aws route53 list-hosted-zones-by-name --dns-name msp-g1.click --query "HostedZones[0].Id" --output text
-
-# Terraform Output (환경별)
-cd kyeol-infra-terraform/envs/dev
-terraform output alb_controller_role_arn
-terraform output external_dns_role_arn
-terraform output ecr_repository_urls
+aws route53 list-hosted-zones-by-name --dns-name mgz-g2-u3.shop --query "HostedZones[0].Id" --output text
 ```
